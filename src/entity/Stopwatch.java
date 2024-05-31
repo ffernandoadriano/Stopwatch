@@ -2,8 +2,6 @@ package entity;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class Stopwatch extends JDialog {
     /**
@@ -13,19 +11,19 @@ public class Stopwatch extends JDialog {
     /**
      * timer field created with default value "00:00:00"
      */
-    private JTextField jTextFieldStopwatch = new JTextField("00:00:00");
+    private final JTextField jTextFieldStopwatch = new JTextField("00:00:00");
     /**
      * created button start
      */
-    private JButton jButtonStart = new JButton("Start");
+    private final JButton jButtonStart = new JButton("Start");
     /**
      * created button stop
      */
-    private JButton jButtonStop = new JButton("Stop");
+    private final JButton jButtonStop = new JButton("Stop");
     /**
      * created button restart
      */
-    private JButton jButtonRestart = new JButton("Restart");
+    private final JButton jButtonRestart = new JButton("Restart");
     /**
      * created second
      */
@@ -41,36 +39,44 @@ public class Stopwatch extends JDialog {
     /**
      * created a reference of thread
      */
-    private Thread thread;
+    private transient Thread thread;
+
+    /**
+     * Boolean flag that controls whether the thread should continue executing.
+     * <p>
+     * When true, the thread continues its execution. When false, the thread ends its execution.
+     */
+    private volatile boolean running = true;
 
     /**
      * created an instance runnable
      */
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            while (true) {
-                second++;
+    private final transient Runnable runnable = () -> {
+        while (running) {
+            second++;
 
-                if (second == 60) {
-                    second = 0;
-                    minute++;
-                }
-                if (minute == 60) {
-                    minute = 0;
-                    hour++;
-                }
+            if (second == 60) {
+                second = 0;
+                minute++;
+            }
+            if (minute == 60) {
+                minute = 0;
+                hour++;
+            }
 
-                jTextFieldStopwatch.setText((String.valueOf(hour).length() > 1 ? hour : "0" + hour) + ":" + (String.valueOf(minute).length() > 1 ? minute : "0" + minute) + ":" + (String.valueOf(second).length() > 1 ? second : "0" + second));
+            jTextFieldStopwatch.setText((String.valueOf(hour).length() > 1 ? hour : "0" + hour) + ":" + (String.valueOf(minute).length() > 1 ? minute : "0" + minute) + ":" + (String.valueOf(second).length() > 1 ? second : "0" + second));
 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     };
+
+    public void stop() {
+        running = false;
+    }
 
 
     public Stopwatch() {
@@ -119,41 +125,33 @@ public class Stopwatch extends JDialog {
         jButtonStop.setEnabled(false); // disable JButton stop
         jButtonRestart.setEnabled(false); // disable JButton restart
 
-        jButtonStart.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                thread = new Thread(runnable);
-                thread.start();
+        jButtonStart.addActionListener(e -> {
+            thread = new Thread(runnable);
+            thread.start();
+            running = true;
 
-                jButtonStart.setEnabled(false); // disable JButton start
-                jButtonStop.setEnabled(true); //active JButton stop
-                jButtonRestart.setEnabled(false); // disable JButton restart
-            }
+            jButtonStart.setEnabled(false); // disable JButton start
+            jButtonStop.setEnabled(true); //active JButton stop
+            jButtonRestart.setEnabled(false); // disable JButton restart
         });
 
-        jButtonStop.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                thread.stop();
+        jButtonStop.addActionListener(e -> {
+            stop(); // terminates the current thread
 
-                jButtonStop.setEnabled(false); // disable JButton stop
-                jButtonStart.setEnabled(true); // active JButton start
-                jButtonRestart.setEnabled(true); // active JButton restart
-            }
+            jButtonStop.setEnabled(false); // disable JButton stop
+            jButtonStart.setEnabled(true); // active JButton start
+            jButtonRestart.setEnabled(true); // active JButton restart
         });
 
-        jButtonRestart.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jTextFieldStopwatch.setText("00:00:00"); // restore display default value
-                hour = 0; //reset time
-                minute = 0; // restart minute
-                second = 0; // restart second
+        jButtonRestart.addActionListener(e -> {
+            jTextFieldStopwatch.setText("00:00:00"); // restore display default value
+            hour = 0; //reset time
+            minute = 0; // restart minute
+            second = 0; // restart second
 
-                jButtonRestart.setEnabled(false); // disable JButton restart
-                jButtonStop.setEnabled(false); // disable JButton stop
-                jButtonStart.setEnabled(true); // active JButton start
-            }
+            jButtonRestart.setEnabled(false); // disable JButton restart
+            jButtonStop.setEnabled(false); // disable JButton stop
+            jButtonStart.setEnabled(true); // active JButton start
         });
 
 
