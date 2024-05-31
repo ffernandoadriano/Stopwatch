@@ -2,12 +2,14 @@ package entity;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Stopwatch extends JDialog {
     /**
      * created panel manager
      */
-    private JPanel jPanel = new JPanel(new GridBagLayout());
+    private final JPanel jPanel = new JPanel(new GridBagLayout());
     /**
      * timer field created with default value "00:00:00"
      */
@@ -49,6 +51,11 @@ public class Stopwatch extends JDialog {
     private volatile boolean running = true;
 
     /**
+     * created log
+     */
+    private static final Logger LOGGER = Logger.getLogger(Stopwatch.class.getName());
+
+    /**
      * created an instance runnable
      */
     private final transient Runnable runnable = () -> {
@@ -69,7 +76,9 @@ public class Stopwatch extends JDialog {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                /* Clean up whatever needs to be handled before interrupting  */
+                Thread.currentThread().interrupt();
             }
         }
     };
