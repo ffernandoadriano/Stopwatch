@@ -106,7 +106,7 @@ public class Stopwatch extends JDialog {
         jTextFieldStopwatch.setPreferredSize(new Dimension(340, 70)); // size of JTextFiled
         jTextFieldStopwatch.setFont(new Font(Font.DIALOG, Font.BOLD, 80)); // font personalized
         jTextFieldStopwatch.setEnabled(false); // allow edit
-        jTextFieldStopwatch.setHorizontalAlignment(JTextField.CENTER); // centralize the component inside field
+        jTextFieldStopwatch.setHorizontalAlignment(SwingConstants.CENTER); // centralize the component inside field
         jPanel.add(jTextFieldStopwatch, gridBagConstraints); // adding in panel the JTextField
 
         /* -------- Adding JButtonStart --------------*/
