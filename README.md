@@ -5,12 +5,12 @@
 ### - **Tópicos POO:**
 - Encapsulamento
 - Construtores
-- Associações
 - Modificadores de acesso
 - Downcasting
 - Upcasting
 - Membros estáticos
-- Overriding
-- Overloading
-- Polimorfismo (ToString)
+- Polimorfismo
 - Exceções
+
+### - **Programação funcional:**
+- Expressões lambda
